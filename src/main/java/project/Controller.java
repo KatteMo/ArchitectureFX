@@ -66,14 +66,13 @@ public class Controller {
         boolean next_step = buffer.addTask(newTask);
 
         if (!next_step) {
-            pointer = buffer.getPointer();
-            addEvent(EventType.generateTask, newTask.getNumberOfTask(),
-                    "Место куда можем поставить заявку, если свободно: " + (pointer + 1));
             Task chosenTask = buffer.denyTask(newTask);
             pointer = buffer.getPointer();
             if (pointer == 0) {
                 pointer = buffer.getSize();
             }
+            addEvent(EventType.generateTask, newTask.getNumberOfTask(),
+                    "Место куда можем поставить заявку: " + (pointer));
             currSource.addDenyTask();
             addEvent(EventType.denyTask, chosenTask.getNumberOfTask(),
                     "Место в буфере откуда убрали заявку: " + pointer);

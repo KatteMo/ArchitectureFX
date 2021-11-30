@@ -18,6 +18,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -37,7 +38,6 @@ public class StepApplication extends Application {
     Modeling modeling;
     ArrayList<Event> events;
     int numStep = 0;
-    int finishCount = 0;
     int generateCount = 0;
     Map<Integer, String> dict = new HashMap<Integer, String>();
 
@@ -107,7 +107,15 @@ public class StepApplication extends Application {
                 int num = findPlaceInTable(nextEvent.getTaskId());
                 gridPane.add(nextLabel, num, countOfSources + countOfDevices + bufferSize + 4);
                 gridPane.add(currLabel, generateCount + 1, getNumOfDev(nextEvent) + 1 + countOfSources);
-            }else {
+
+                int len = 30 * (countOfDevices + bufferSize + 3 - getNumOfDev(nextEvent) - 1);
+                Line line = new Line(0, 0, 0, len + 3);
+                line.setStroke(Color.RED);
+                line.getStrokeDashArray().addAll(25.0, 10.0);
+                GridPane.setHalignment(line, HPos.CENTER);
+                GridPane.setValignment(line, VPos.TOP);
+                gridPane.add(line, num, getNumOfDev(nextEvent) + 2 + countOfSources);
+            } else {
                 gridPane.add(currLabel, generateCount + 1, getNumOfDev(currEvent) + 1 + countOfSources);
             }
             generateCount++;
@@ -126,10 +134,9 @@ public class StepApplication extends Application {
                 gridPane.add(currLabel, generateCount, getNumOfDev(currEvent) + bufferSize + 2 + countOfSources);
                 gridPane.add(line, generateCount, pointer + 1 + countOfSources);
             }
-        } else if (currType == EventType.finishDevice) {
-            finishCount++;
         }
         numStep++;
+        makePart(gridPane);
     }
 
     public int findPlaceInTable(String id) {
@@ -163,6 +170,26 @@ public class StepApplication extends Application {
             }
         }
         return events.get(0);
+    }
+
+    public void makePart(GridPane gridPane) {
+        Rectangle rect = new Rectangle(40, 30, Color.GRAY);
+        GridPane.setHalignment(rect, HPos.CENTER);
+        GridPane.setValignment(rect, VPos.CENTER);
+        for (int i = 0; i < countOfSources + countOfDevices + bufferSize + 5; i++) {
+            if (i == 0 && generateCount != 1) {
+                gridPane.add(rect, generateCount, 0);
+            } else if (i == countOfSources + 1) {
+                rect = new Rectangle(40, 30, Color.GRAY);
+                gridPane.add(rect, generateCount, i);
+            } else if (i == countOfSources + bufferSize + 2) {
+                rect = new Rectangle(40, 30, Color.GRAY);
+                gridPane.add(rect, generateCount, i);
+            } else if (i == countOfSources + countOfDevices + bufferSize + 3) {
+                rect = new Rectangle(40, 30, Color.GRAY);
+                gridPane.add(rect, generateCount, i);
+            }
+        }
     }
 
     public void makeTable(GridPane gridPane) {
