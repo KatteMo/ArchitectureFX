@@ -1,8 +1,10 @@
 package project;
 
+import javax.xml.stream.FactoryConfigurationError;
 import java.util.ArrayList;
 
 public class Controller {
+
     private int countOfDevices;
     private int countOfSources;
     private double lambda;
@@ -31,6 +33,14 @@ public class Controller {
         return countOfSources;
     }
 
+    public int getCountOfDevices() {
+        return countOfDevices;
+    }
+
+    public ArrayList<Event> getEvents() {
+        return events;
+    }
+
     void createTask(Buffer buffer, double startTime, double timeOfUsing) {
         fillFreeDevices(startTime);
         if (!finishDevices.isEmpty() && !buffer.isEmpty()) {
@@ -51,26 +61,30 @@ public class Controller {
         currSource.addNewTask();
         Task newTask = new Task(currSource.getCountOfTasks(), currSource.getNumberOfSource(), startTime, timeOfUsing);
         currSource.addTimeUse(newTask.getTimeOfUsing());
-        int pointer = buffer.getPointer();
-        if (pointer == 0) {
-            pointer = 6;
-        }
-        addEvent(EventType.generateTask, newTask.getNumberOfTask(),
-                "Место куда можем поставить заявку, если свободно: " + pointer);
+        int pointer;
 
         boolean next_step = buffer.addTask(newTask);
 
         if (!next_step) {
+            pointer = buffer.getPointer();
+            addEvent(EventType.generateTask, newTask.getNumberOfTask(),
+                    "Место куда можем поставить заявку, если свободно: " + (pointer + 1));
             Task chosenTask = buffer.denyTask(newTask);
             pointer = buffer.getPointer();
             if (pointer == 0) {
-                pointer = 6;
+                pointer = buffer.getSize();
             }
             currSource.addDenyTask();
             addEvent(EventType.denyTask, chosenTask.getNumberOfTask(),
                     "Место в буфере откуда убрали заявку: " + pointer);
         } else {
             Task chosenTask = buffer.outTask();
+            pointer = buffer.getPointer();
+            if (pointer == 0){
+                pointer = buffer.getSize();
+            }
+            addEvent(EventType.generateTask, newTask.getNumberOfTask(),
+                    "Место куда поставили заявку: " + (pointer));
             if (setTaskOnDeviceByBuffer(chosenTask, startTime)) {
                 buffer.taskGoToDevice();
             }
@@ -118,7 +132,7 @@ public class Controller {
         for (Device currentDevice : devices) {
             if (currentDevice.isFree(currTime)) {
                 if (currentDevice.getStartTime() != 0) {
-                    addEvent(EventType.finishDevice, findEventByNum(currentDevice.getNumberOfDevice()),
+                    addEvent(EventType.finishDevice, findEventByNum(currentDevice),
                             "Номер закончившего девайса: " + (currentDevice.getNumberOfDevice()));
                 }
                 currentDevice.setStartTime(currTime);
@@ -138,7 +152,7 @@ public class Controller {
         for (Device currentDevice : devices) {
             if (currentDevice.getNumberOfDevice() == num) {
                 if (currentDevice.getStartTime() != 0) {
-                    addEvent(EventType.finishDevice, findEventByNum(currentDevice.getNumberOfDevice()),
+                    addEvent(EventType.finishDevice, findEventByNum(currentDevice),
                             "Номер закончившего девайса: " + (currentDevice.getNumberOfDevice()));
                 }
                 double time = currentDevice.getEndTime();
@@ -157,7 +171,6 @@ public class Controller {
 
     public void finishWork(Buffer buffer, double currTime) {
         double delta = 0;
-        int freeDevices = 0;
         while (true) {
             fillFreeDevices(currTime);
             if (!finishDevices.isEmpty()) {
@@ -173,20 +186,19 @@ public class Controller {
                     }
                 } else {
                     for (Device curDev : finishDevices) {
-                        freeDevices++;
                         //System.out.println("\nОкончательно закончил девайс: " + curDev);
-                        addEvent(EventType.finishDevice, findEventByNum(curDev.getNumberOfDevice()),
+                        addEvent(EventType.finishDevice, findEventByNum(curDev),
                                 "Номер закончившего девайса: " + (curDev.getNumberOfDevice()));
-                        if (freeDevices == countOfDevices) {
+                        curDev.setStartTime(0);
+                        if (isAllFinish()) {
                             workingTime = curDev.getEndTime();
                             break;
                         }
-                        curDev.setStartTime(0);
                     }
                 }
                 finishDevices.clear();
             }
-            if (freeDevices == countOfDevices) {
+            if (isAllFinish()) {
                 break;
             }
             delta = (-1 / lambda) * Math.log(Math.random());
@@ -195,16 +207,27 @@ public class Controller {
         //System.out.println(events);
     }
 
+    public boolean isAllFinish() {
+        for (Device curDev : devices) {
+            if (curDev.getStartTime() != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void addEvent(EventType type, String eventId, String addInfo) {
         Event currEvent = new Event(type, eventId, addInfo);
         events.add(currEvent);
     }
 
-    public String findEventByNum(int num) {
-        for (Event curEvent : events) {
-            int curNum = getNumOfDev(curEvent);
-            if (curNum == num) {
-                return curEvent.getTaskId();
+    public String findEventByNum(Device dev) {
+        int s = events.size();
+        for (int i = s-1; i >= 0; i--) {
+            Event curEv = events.get(i);
+            int curNum = getNumOfDev(curEv);
+            if (curNum == dev.getNumberOfDevice() && curEv.getType() == EventType.startDevice) {
+                return curEv.getTaskId();
             }
         }
         return "";
@@ -239,13 +262,4 @@ public class Controller {
         }
         events.clear();
     }
-
-    public void nextStep(Buffer buffer, int countOfTasks, Controller controller) {
-
-    }
-
-//    public double makeShorter(double num) {
-//        String formattedDouble = String.format("%.3f", num);
-//        return Double.parseDouble(formattedDouble.replace(",", "."));
-//    }
 }

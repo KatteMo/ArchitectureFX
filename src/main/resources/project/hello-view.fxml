@@ -6,18 +6,19 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #f2f1eb" xmlns="http://javafx.com/javafx/16"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.AutoController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="project.HelloController">
     <children>
+        <Button fx:id="stepMode" layoutX="338.0" layoutY="314.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="158.0" text="Пошаговый режим" />
         <Button fx:id="autoMode" layoutX="75.0" layoutY="314.0" mnemonicParsing="false" text="Автоматический режим" />
 
-        <TextField fx:id="insDevices" layoutX="190.0" layoutY="65.0" style="-fx-border-color: silver;" />
-                               <Label layoutX="63.0" layoutY="70.0" text="Кол-во устройств:" />
+        <TextField fx:id="insSources" layoutX="190.0" layoutY="65.0" style="-fx-border-color: silver;" />
+                               <Label layoutX="63.0" layoutY="70.0" text="Кол-во источников:" />
 
-        <TextField fx:id="insSources" layoutX="190.0" layoutY="95.0" style="-fx-border-color: silver;" />
-                               <Label layoutX="63.0" layoutY="100.0" text="Кол-во источников:" />
+        <TextField fx:id="insBuffers" layoutX="190.0" layoutY="95.0" style="-fx-border-color: silver;" />
+                               <Label layoutX="63.0" layoutY="100.0" text="Кол-во буфферов:" />
 
-        <TextField fx:id="insBuffers" layoutX="190.0" layoutY="125.0" style="-fx-border-color: silver;" />
-                               <Label layoutX="63.0" layoutY="130.0" text="Кол-во буфферов:" />
+        <TextField fx:id="insDevices" layoutX="190.0" layoutY="125.0" style="-fx-border-color: silver;" />
+                               <Label layoutX="63.0" layoutY="130.0" text="Кол-во устройств:" />
 
 
         <TextField fx:id="insLambda" layoutX="190.0" layoutY="155.0" style="-fx-border-color: silver;" />

@@ -44,7 +44,7 @@ public class Modeling {
             p1 = controller.getDenyOfSources();
             System.out.println("num: " + count0);
         }
-        System.out.println("the end: " + count0);
+        System.out.println("the end: " + count1);
 
         controller.showStats();
     }
@@ -55,6 +55,14 @@ public class Modeling {
     }
 
     public void beginStepByStepMode() {
-        controller.nextStep(buffer, countOfTasks, controller);
+        startByCountOfTask(countOfTasks);
+    }
+
+    public Controller getController() {
+        return controller;
+    }
+
+    public int getBufferSize() {
+        return bufferSize;
     }
 }

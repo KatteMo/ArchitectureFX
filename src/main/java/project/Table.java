@@ -54,7 +54,7 @@ public class Table extends JFrame {
         contents.add(new JScrollPane(table2));
 
         setContentPane(contents);
-        setSize(750, 30 * (outDevices.size() + outSources.size()));
+        setSize(750, 100 + 20 * (outDevices.size() + outSources.size()));
         setVisible(true);
 
     }

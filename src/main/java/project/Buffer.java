@@ -77,9 +77,9 @@ public class Buffer {
             }
             arrayTask.set(pointer, task);
             pointer = (pointer == size - 1) ? 0 : pointer + 1;
-            int printPointer = pointer;
-            if (pointer == 0) {printPointer = 6;}
-            //System.out.println("New task was added in buffer №" + printPointer + ", new pointer:" + (pointer + 1) + ";  " + task);
+//            int printPointer = pointer;
+//            if (pointer == 0) {printPointer = size;}
+//            System.out.println("New task was added in buffer №" + printPointer + ", new pointer:" + (pointer + 1) + ";  " + task);
             occupied_size += 1;
             int word = task.getSourceNumber();
             plusCountPackage(word);
@@ -125,10 +125,6 @@ public class Buffer {
         occupied_size -= 1;
         addTask(task);
         return knockOutTask;
-    }
-
-    public void erase(){
-
     }
 
     public boolean isEmpty() {
